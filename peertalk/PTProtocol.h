@@ -17,9 +17,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef uint32_t PTFrameTag NS_TYPED_EXTENSIBLE_ENUM;
+
 // Special frame tag that signifies "no tag". Your implementation should never
 // create a reply for a frame with this tag.
-static const uint32_t PTFrameNoTag = 0;
+static PTFrameTag const PTFrameTagNone = 0;
 
 typedef uint32_t PTFrameType NS_TYPED_EXTENSIBLE_ENUM;
 
@@ -49,13 +51,13 @@ FOUNDATION_EXPORT NSString * const PTProtocolErrorDomain;
 #pragma mark Sending frames
 
 // Generate a new tag that is unique within this protocol object.
-- (uint32_t)newTag;
+- (PTFrameTag)newTag;
 
 // Send a frame over *channel* with an optional payload and optional callback.
 // If *callback* is not NULL, the block is invoked when either an error occured
 // or when the frame (and payload, if any) has been completely sent.
 - (void)sendFrameOfType:(PTFrameType)frameType
-                    tag:(uint32_t)tag
+                    tag:(PTFrameTag)tag
             withPayload:(dispatch_data_t)payload
             overChannel:(dispatch_io_t)channel
                callback:(nullable void(^)(NSError * _Nullable error))callback;
@@ -70,7 +72,7 @@ FOUNDATION_EXPORT NSString * const PTProtocolErrorDomain;
 - (void)readFramesOverChannel:(dispatch_io_t)channel
                       onFrame:(nullable void(^)(NSError * _Nullable error,
                                                 PTFrameType type,
-                                                uint32_t tag,
+                                                PTFrameTag tag,
                                                 uint32_t payloadSize,
                                                 dispatch_block_t resumeReadingFrames))onFrame;
 
@@ -79,7 +81,7 @@ FOUNDATION_EXPORT NSString * const PTProtocolErrorDomain;
 - (void)readFrameOverChannel:(dispatch_io_t)channel
                     callback:(nullable void(^)(NSError * _Nullable error,
                                                PTFrameType frameType,
-                                               uint32_t frameTag,
+                                               PTFrameTag frameTag,
                                                uint32_t payloadSize))callback;
 
 #pragma mark Receiving frame payloads

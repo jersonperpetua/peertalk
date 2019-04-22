@@ -59,7 +59,7 @@
 - (void)sendMessage:(NSString*)message {
   if (peerChannel_) {
     dispatch_data_t payload = PTExampleTextDispatchDataWithString(message);
-    [peerChannel_ sendFrameOfType:PTExampleFrameTypeTextMessage tag:PTFrameNoTag withPayload:payload callback:^(NSError *error) {
+    [peerChannel_ sendFrameOfType:PTExampleFrameTypeTextMessage tag:PTFrameTagNone withPayload:payload callback:^(NSError *error) {
       if (error) {
         NSLog(@"Failed to send message: %@", error);
       }
@@ -106,7 +106,7 @@
                         [NSNumber numberWithDouble:screen.scale], @"screenScale",
                         nil];
   dispatch_data_t payload = [info createReferencingDispatchData];
-  [peerChannel_ sendFrameOfType:PTExampleFrameTypeDeviceInfo tag:PTFrameNoTag withPayload:payload callback:^(NSError *error) {
+  [peerChannel_ sendFrameOfType:PTExampleFrameTypeDeviceInfo tag:PTFrameTagNone withPayload:payload callback:^(NSError *error) {
     if (error) {
       NSLog(@"Failed to send PTExampleFrameTypeDeviceInfo: %@", error);
     }
@@ -118,7 +118,7 @@
 
 // Invoked to accept an incoming frame on a channel. Reply NO ignore the
 // incoming frame. If not implemented by the delegate, all frames are accepted.
-- (BOOL)ioFrameChannel:(PTChannel*)channel shouldAcceptFrameOfType:(PTFrameType)type tag:(uint32_t)tag payloadSize:(uint32_t)payloadSize {
+- (BOOL)ioFrameChannel:(PTChannel*)channel shouldAcceptFrameOfType:(PTFrameType)type tag:(PTFrameTag)tag payloadSize:(uint32_t)payloadSize {
   if (channel != peerChannel_) {
     // A previous channel that has been canceled but not yet ended. Ignore.
     return NO;
@@ -132,7 +132,7 @@
 }
 
 // Invoked when a new frame has arrived on a channel.
-- (void)ioFrameChannel:(PTChannel*)channel didReceiveFrameOfType:(PTFrameType)type tag:(uint32_t)tag payload:(PTData*)payload {
+- (void)ioFrameChannel:(PTChannel*)channel didReceiveFrameOfType:(PTFrameType)type tag:(PTFrameTag)tag payload:(PTData*)payload {
   //NSLog(@"didReceiveFrameOfType: %u, %u, %@", type, tag, payload);
   if (type == PTExampleFrameTypeTextMessage) {
     PTExampleTextFrame *textFrame = (PTExampleTextFrame*)payload.data;

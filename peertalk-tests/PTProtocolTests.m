@@ -118,10 +118,10 @@ static const PTFrameType PTFrameTypeTestPingReply = PTFrameTypeTestPing - 1;
 
 - (void)readFrameWithClient:(int)clientIndex
           expectedFrameType:(PTFrameType)expectedFrameType
-           expectedFrameTag:(uint32_t)expectedFrameTag
+           expectedFrameTag:(PTFrameTag)expectedFrameTag
         expectedPayloadSize:(uint32_t)expectedPayloadSize
                    callback:(void(^)(dispatch_data_t contiguousData, const uint8_t *buffer, size_t bufferSize))callback {
-  [protocol_[clientIndex] readFrameOverChannel:channel_[clientIndex] callback:^(NSError *error, PTFrameType receivedFrameType, uint32_t receivedFrameTag, uint32_t receivedPayloadSize) {
+  [protocol_[clientIndex] readFrameOverChannel:channel_[clientIndex] callback:^(NSError *error, PTFrameType receivedFrameType, PTFrameTag receivedFrameTag, uint32_t receivedPayloadSize) {
     if (error) XCTFail(@"readFrameOverChannel failed: %@", error);
     XCTAssertEqual(receivedFrameType, expectedFrameType);
     XCTAssertEqual(receivedFrameTag, expectedFrameTag);
@@ -173,14 +173,14 @@ static const PTFrameType PTFrameTypeTestPingReply = PTFrameTypeTestPing - 1;
 - (void)test2_protocol_transmit_frame {
   dispatch_semaphore_t sem1 = dispatch_semaphore_create(0);
 
-  uint32_t frameTag = PTFrameNoTag;
+  PTFrameTag frameTag = PTFrameNoTag;
   uint32_t payloadSize = 0;
 
   [protocol_[0] sendFrameOfType:PTFrameTypeTestPing tag:frameTag withPayload:nil overChannel:channel_[0] callback:^(NSError *error) {
     if (error) XCTFail(@"sendFrameOfType failed: %@", error);
   }];
 
-  [protocol_[1] readFrameOverChannel:channel_[1] callback:^(NSError *error, PTFrameType receivedFrameType, uint32_t receivedFrameTag, uint32_t receivedPayloadSize) {
+  [protocol_[1] readFrameOverChannel:channel_[1] callback:^(NSError *error, PTFrameType receivedFrameType, PTFrameTag receivedFrameTag, uint32_t receivedPayloadSize) {
     if (error) XCTFail(@"readFrameOverChannel failed: %@", error);
     XCTAssertEqual(receivedFrameType, PTFrameTypeTestPing);
     XCTAssertEqual(receivedFrameTag, frameTag);
@@ -196,7 +196,7 @@ static const PTFrameType PTFrameTypeTestPingReply = PTFrameTypeTestPing - 1;
 - (void)test3_protocol_echo_frame {
   dispatch_semaphore_t sem1 = dispatch_semaphore_create(0);
 
-  uint32_t frameTag = [protocol_[0] newTag];
+  PTFrameTag frameTag = [protocol_[0] newTag];
   uint32_t payloadSize = 0;
   
   // Send frame on channel 0
@@ -205,7 +205,7 @@ static const PTFrameType PTFrameTypeTestPingReply = PTFrameTypeTestPing - 1;
   }];
   
   // Read frame on channel 1
-  [protocol_[1] readFrameOverChannel:channel_[1] callback:^(NSError *error, PTFrameType receivedFrameType, uint32_t receivedFrameTag, uint32_t receivedPayloadSize) {
+  [protocol_[1] readFrameOverChannel:channel_[1] callback:^(NSError *error, PTFrameType receivedFrameType, PTFrameTag receivedFrameTag, uint32_t receivedPayloadSize) {
     if (error) XCTFail(@"readFrameOverChannel failed: %@", error);
     XCTAssertEqual(receivedFrameType, PTFrameTypeTestPing);
     XCTAssertEqual(receivedFrameTag, frameTag);
@@ -218,7 +218,7 @@ static const PTFrameType PTFrameTypeTestPingReply = PTFrameTypeTestPing - 1;
   }];
   
   // Read reply on channel 0 (we expect a reply)
-  [protocol_[0] readFrameOverChannel:channel_[0] callback:^(NSError *error, PTFrameType receivedFrameType, uint32_t receivedFrameTag, uint32_t receivedPayloadSize) {
+  [protocol_[0] readFrameOverChannel:channel_[0] callback:^(NSError *error, PTFrameType receivedFrameType, PTFrameTag receivedFrameTag, uint32_t receivedPayloadSize) {
     if (error) XCTFail(@"readFrameOverChannel failed: %@", error);
     XCTAssertEqual(receivedFrameType, PTFrameTypeTestPingReply);
     XCTAssertEqual(receivedFrameTag, frameTag);
@@ -266,7 +266,7 @@ static const PTFrameType PTFrameTypeTestPingReply = PTFrameTypeTestPing - 1;
   
   const int totalNumberOfFrames = 20;
   PTFrameType frameTypes[totalNumberOfFrames];
-  uint32_t tags[totalNumberOfFrames];
+  PTFrameTag tags[totalNumberOfFrames];
   
   for (int i = 0; i < totalNumberOfFrames; ++i ) {
     frameTypes[i] = PTFrameTypeTestPing - i; // note: PTFrameTypeTest* are adjusted to UINT32_MAX, thus we subtract to avoid overflow
@@ -304,7 +304,7 @@ static const PTFrameType PTFrameTypeTestPingReply = PTFrameTypeTestPing - 1;
   for (int i = 0; i < totalNumberOfFrames; ++i ) {
     PTFrameType frameType = PTFrameTypeTestPing - i;
     [frameTypes addObject:[NSNumber numberWithUnsignedInt:frameType]]; // note: PTFrameTypeTest* are adjusted to UINT32_MAX, thus we subtract to avoid overflow
-    uint32_t tag = [protocol_[0] newTag];
+    PTFrameTag tag = [protocol_[0] newTag];
     [tags addObject:[NSNumber numberWithUnsignedInt:tag]];
     
     dispatch_data_t payload = NULL;
@@ -324,11 +324,11 @@ static const PTFrameType PTFrameTypeTestPingReply = PTFrameTypeTestPing - 1;
   
   // Read all frames on channel 1
   __block int read_i = 0;
-  [protocol_[1] readFramesOverChannel:channel_[1] onFrame:^(NSError *error, PTFrameType type, uint32_t tag, uint32_t payloadSize, dispatch_block_t resumeReadingFrames) {
+  [protocol_[1] readFramesOverChannel:channel_[1] onFrame:^(NSError *error, PTFrameType type, PTFrameTag tag, uint32_t payloadSize, dispatch_block_t resumeReadingFrames) {
     if (error) XCTFail(@"readFramesOverChannel failed: %@", error);
     
     PTFrameType expectedType = [[frameTypes objectAtIndex:read_i] unsignedIntValue];
-    uint32_t expectedTag = [[tags objectAtIndex:read_i] unsignedIntValue];
+    PTFrameTag expectedTag = [[tags objectAtIndex:read_i] unsignedIntValue];
     NSData *expectedPayloadData = [payloadData objectAtIndex:read_i];
     if (expectedPayloadData == (id)[NSNull null])
       expectedPayloadData = nil;

@@ -80,7 +80,7 @@
   if (connectedChannel_) {
     NSString *message = self.inputTextField.stringValue;
     dispatch_data_t payload = PTExampleTextDispatchDataWithString(message);
-    [connectedChannel_ sendFrameOfType:PTExampleFrameTypeTextMessage tag:PTFrameNoTag withPayload:payload callback:^(NSError *error) {
+    [connectedChannel_ sendFrameOfType:PTExampleFrameTypeTextMessage tag:PTFrameTagNone withPayload:payload callback:^(NSError *error) {
       if (error) {
         NSLog(@"Failed to send message: %@", error);
       }
@@ -142,7 +142,7 @@
 #pragma mark - Ping
 
 
-- (void)pongWithTag:(uint32_t)tagno error:(NSError*)error {
+- (void)pongWithTag:(PTFrameTag)tagno error:(NSError*)error {
   NSNumber *tag = [NSNumber numberWithUnsignedInt:tagno];
   NSMutableDictionary *pingInfo = [pings_ objectForKey:tag];
   if (pingInfo) {
@@ -159,7 +159,7 @@
     if (!pings_) {
       pings_ = [NSMutableDictionary dictionary];
     }
-    uint32_t tagno = [connectedChannel_.protocol newTag];
+    PTFrameTag tagno = [connectedChannel_.protocol newTag];
     NSNumber *tag = [NSNumber numberWithUnsignedInt:tagno];
     NSMutableDictionary *pingInfo = [NSMutableDictionary dictionaryWithObjectsAndKeys:[NSDate date], @"date created", nil];
     [pings_ setObject:pingInfo forKey:tag];
@@ -179,7 +179,7 @@
 #pragma mark - PTChannelDelegate
 
 
-- (BOOL)ioFrameChannel:(PTChannel*)channel shouldAcceptFrameOfType:(PTFrameType)type tag:(uint32_t)tag payloadSize:(uint32_t)payloadSize {
+- (BOOL)ioFrameChannel:(PTChannel*)channel shouldAcceptFrameOfType:(PTFrameType)type tag:(PTFrameTag)tag payloadSize:(uint32_t)payloadSize {
   if (   type != PTExampleFrameTypeDeviceInfo
       && type != PTExampleFrameTypeTextMessage
       && type != PTExampleFrameTypePing
@@ -193,7 +193,7 @@
   }
 }
 
-- (void)ioFrameChannel:(PTChannel*)channel didReceiveFrameOfType:(PTFrameType)type tag:(uint32_t)tag payload:(PTData*)payload {
+- (void)ioFrameChannel:(PTChannel*)channel didReceiveFrameOfType:(PTFrameType)type tag:(PTFrameTag)tag payload:(PTData*)payload {
   //NSLog(@"received %@, %u, %u, %@", channel, type, tag, payload);
   if (type == PTExampleFrameTypeDeviceInfo) {
     NSDictionary *deviceInfo = [NSDictionary dictionaryWithContentsOfDispatchData:payload.dispatchData];

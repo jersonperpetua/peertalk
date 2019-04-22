@@ -472,7 +472,7 @@ static const uint8_t kUserInfoKey;
     return NO;
   };
   
-  [protocol_ readFramesOverChannel:channel onFrame:^(NSError *error, PTFrameType type, uint32_t tag, uint32_t payloadSize, dispatch_block_t resumeReadingFrames) {
+  [protocol_ readFramesOverChannel:channel onFrame:^(NSError *error, PTFrameType type, PTFrameTag tag, uint32_t payloadSize, dispatch_block_t resumeReadingFrames) {
     if (handleError(error, type == PTFrameTypeEndOfStream)) {
       return;
     }
@@ -521,7 +521,7 @@ static const uint8_t kUserInfoKey;
 
 #pragma mark - Sending
 
-- (void)sendFrameOfType:(PTFrameType)frameType tag:(uint32_t)tag withPayload:(dispatch_data_t)payload callback:(void(^)(NSError *error))callback {
+- (void)sendFrameOfType:(PTFrameType)frameType tag:(PTFrameTag)tag withPayload:(dispatch_data_t)payload callback:(void(^)(NSError *error))callback {
   if (connState_ == kConnStateConnecting || connState_ == kConnStateConnected) {
     [protocol_ sendFrameOfType:frameType tag:tag withPayload:payload overChannel:dispatchObj_channel_ callback:callback];
   } else if (callback) {

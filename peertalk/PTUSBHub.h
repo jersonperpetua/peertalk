@@ -1,6 +1,8 @@
 #include <dispatch/dispatch.h>
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 // PTUSBDeviceDidAttachNotification
 // Posted when a device has been attached. Also posted for each device that is
 // already attached when the PTUSBHub starts listening.
@@ -61,8 +63,8 @@ typedef enum {
 //
 - (void)connectToDevice:(NSNumber*)deviceID
                    port:(int)port
-                onStart:(void(^)(NSError *error, dispatch_io_t channel))onStart
-                  onEnd:(void(^)(NSError *error))onEnd;
+                onStart:(void(^)(NSError * _Nullable error, dispatch_io_t _Nullable channel))onStart
+                  onEnd:(nullable void(^)(NSError * _Nullable error))onEnd;
 
 // Start listening for devices. You only need to invoke this method on custom
 // instances to start receiving notifications. The shared instance returned from
@@ -76,7 +78,9 @@ typedef enum {
 // listening stopped because of an error. Pass NULL for no callback.
 //
 - (void)listenOnQueue:(dispatch_queue_t)queue
-              onStart:(void(^)(NSError*))onStart
-                onEnd:(void(^)(NSError*))onEnd;
+              onStart:(nullable void(^)(NSError*_Nullable))onStart
+                onEnd:(nullable void(^)(NSError*_Nullable))onEnd;
 
 @end
+
+NS_ASSUME_NONNULL_END

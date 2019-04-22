@@ -34,13 +34,13 @@ FOUNDATION_EXPORT NSString * const PTProtocolErrorDomain;
 @property dispatch_queue_t queue;
 
 // Get the shared protocol object for *queue*
-+ (PTProtocol*)sharedProtocolForQueue:(dispatch_queue_t)queue;
++ (instancetype)sharedProtocolForQueue:(dispatch_queue_t)queue;
 
 // Initialize a new protocol object to use a specific queue.
-- (id)initWithDispatchQueue:(nullable dispatch_queue_t)queue;
+- (instancetype)initWithDispatchQueue:(nullable dispatch_queue_t)queue;
 
 // Initialize a new protocol object to use the current calling queue.
-- (id)init;
+- (instancetype)init;
 
 #pragma mark Sending frames
 

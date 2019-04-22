@@ -35,19 +35,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Create a new channel using the shared PTProtocol for the current dispatch
 // queue, with *delegate*.
-+ (PTChannel*)channelWithDelegate:(id<PTChannelDelegate>)delegate;
++ (instancetype)channelWithDelegate:(id<PTChannelDelegate>)delegate;
 
 
 // Initialize a new frame channel, configuring it to use the calling queue's
 // protocol instance (as returned by [PTProtocol sharedProtocolForQueue:
 //   dispatch_get_current_queue()])
-- (id)init;
+- (instancetype)init;
 
 // Initialize a new frame channel with a specific protocol.
-- (id)initWithProtocol:(PTProtocol*)protocol;
+- (instancetype)initWithProtocol:(PTProtocol*)protocol;
 
 // Initialize a new frame channel with a specific protocol and delegate.
-- (id)initWithProtocol:(PTProtocol*)protocol delegate:(id<PTChannelDelegate>)delegate;
+- (instancetype)initWithProtocol:(PTProtocol*)protocol delegate:(id<PTChannelDelegate>)delegate;
 
 
 // Connect to a TCP port on a device connected over USB

@@ -35,17 +35,6 @@
   }];
 }
 
-- (void)viewDidUnload {
-  if (serverChannel_) {
-    [serverChannel_ close];
-  }
-  [super viewDidUnload];
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-  return interfaceOrientation == UIInterfaceOrientationPortrait;
-}
-
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
   if (peerChannel_) {
     [self sendMessage:self.inputTextField.text];

@@ -12,7 +12,7 @@ typedef struct _PTFrame {
   uint32_t version;
 
   // Type of frame
-  uint32_t type;
+  PTFrameType type;
 
   // Unless zero, a tag is retained in frames that are responses to previous
   // frames. Applications can use this to build transactions or request-response
@@ -31,7 +31,7 @@ typedef struct _PTFrame {
   @public
   dispatch_queue_t queue_;
 }
-- (dispatch_data_t)createDispatchDataWithFrameOfType:(uint32_t)type frameTag:(uint32_t)frameTag payload:(dispatch_data_t)payload;
+- (dispatch_data_t)createDispatchDataWithFrameOfType:(PTFrameType)type frameTag:(uint32_t)frameTag payload:(dispatch_data_t)payload;
 @end
 
 
@@ -115,7 +115,7 @@ static void _release_queue_local_protocol(void *objcobj) {
 #pragma mark Creating frames
 
 
-- (dispatch_data_t)createDispatchDataWithFrameOfType:(uint32_t)type frameTag:(uint32_t)frameTag payload:(dispatch_data_t)payload {
+- (dispatch_data_t)createDispatchDataWithFrameOfType:(PTFrameType)type frameTag:(uint32_t)frameTag payload:(dispatch_data_t)payload {
   PTFrame *frame = CFAllocatorAllocate(kCFAllocatorDefault, sizeof(PTFrame), 0);
   frame->version = htonl(PTProtocolVersion1);
   frame->type = htonl(type);
@@ -150,7 +150,7 @@ static void _release_queue_local_protocol(void *objcobj) {
 #pragma mark Sending frames
 
 
-- (void)sendFrameOfType:(uint32_t)frameType tag:(uint32_t)tag withPayload:(dispatch_data_t)payload overChannel:(dispatch_io_t)channel callback:(void(^)(NSError*))callback {
+- (void)sendFrameOfType:(PTFrameType)frameType tag:(uint32_t)tag withPayload:(dispatch_data_t)payload overChannel:(dispatch_io_t)channel callback:(void(^)(NSError*))callback {
   dispatch_data_t frame = [self createDispatchDataWithFrameOfType:frameType frameTag:tag payload:payload];
   dispatch_io_write(channel, 0, frame, queue_, ^(bool done, dispatch_data_t data, int _errno) {
     if (done && callback) {
@@ -167,7 +167,7 @@ static void _release_queue_local_protocol(void *objcobj) {
 #pragma mark Receiving frames
 
 
-- (void)readFrameOverChannel:(dispatch_io_t)channel callback:(void(^)(NSError *error, uint32_t frameType, uint32_t frameTag, uint32_t payloadSize))callback {
+- (void)readFrameOverChannel:(dispatch_io_t)channel callback:(void(^)(NSError *error, PTFrameType frameType, uint32_t frameTag, uint32_t payloadSize))callback {
   __block dispatch_data_t allData = NULL;
   
   dispatch_io_read(channel, 0, sizeof(PTFrame), queue_, ^(bool done, dispatch_data_t data, int error) {
@@ -314,8 +314,8 @@ static void _release_queue_local_protocol(void *objcobj) {
 }
 
 
-- (void)readFramesOverChannel:(dispatch_io_t)channel onFrame:(void(^)(NSError*, uint32_t, uint32_t, uint32_t, dispatch_block_t))onFrame {
-  [self readFrameOverChannel:channel callback:^(NSError *error, uint32_t type, uint32_t tag, uint32_t payloadSize) {
+- (void)readFramesOverChannel:(dispatch_io_t)channel onFrame:(void(^)(NSError*, PTFrameType, uint32_t, uint32_t, dispatch_block_t))onFrame {
+  [self readFrameOverChannel:channel callback:^(NSError *error, PTFrameType type, uint32_t tag, uint32_t payloadSize) {
     onFrame(error, type, tag, payloadSize, ^{
       if (type != PTFrameTypeEndOfStream) {
         [self readFramesOverChannel:channel onFrame:onFrame];

@@ -118,7 +118,7 @@
 
 // Invoked to accept an incoming frame on a channel. Reply NO ignore the
 // incoming frame. If not implemented by the delegate, all frames are accepted.
-- (BOOL)ioFrameChannel:(PTChannel*)channel shouldAcceptFrameOfType:(uint32_t)type tag:(uint32_t)tag payloadSize:(uint32_t)payloadSize {
+- (BOOL)ioFrameChannel:(PTChannel*)channel shouldAcceptFrameOfType:(PTFrameType)type tag:(uint32_t)tag payloadSize:(uint32_t)payloadSize {
   if (channel != peerChannel_) {
     // A previous channel that has been canceled but not yet ended. Ignore.
     return NO;
@@ -132,7 +132,7 @@
 }
 
 // Invoked when a new frame has arrived on a channel.
-- (void)ioFrameChannel:(PTChannel*)channel didReceiveFrameOfType:(uint32_t)type tag:(uint32_t)tag payload:(PTData*)payload {
+- (void)ioFrameChannel:(PTChannel*)channel didReceiveFrameOfType:(PTFrameType)type tag:(uint32_t)tag payload:(PTData*)payload {
   //NSLog(@"didReceiveFrameOfType: %u, %u, %@", type, tag, payload);
   if (type == PTExampleFrameTypeTextMessage) {
     PTExampleTextFrame *textFrame = (PTExampleTextFrame*)payload.data;

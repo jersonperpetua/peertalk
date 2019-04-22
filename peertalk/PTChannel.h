@@ -70,7 +70,7 @@ NS_ASSUME_NONNULL_BEGIN
 // Send a frame with an optional payload and optional callback.
 // If *callback* is not NULL, the block is invoked when either an error occured
 // or when the frame (and payload, if any) has been completely sent.
-- (void)sendFrameOfType:(uint32_t)frameType tag:(uint32_t)tag withPayload:(nullable dispatch_data_t)payload callback:(nullable void(^)(NSError *error))callback;
+- (void)sendFrameOfType:(PTFrameType)frameType tag:(uint32_t)tag withPayload:(nullable dispatch_data_t)payload callback:(nullable void(^)(NSError *error))callback;
 
 // Lower-level method to assign a connected dispatch IO channel to this channel
 - (BOOL)startReadingFromConnectedChannel:(dispatch_io_t)channel error:(__autoreleasing NSError**)error;
@@ -110,12 +110,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @required
 // Invoked when a new frame has arrived on a channel.
-- (void)ioFrameChannel:(PTChannel*)channel didReceiveFrameOfType:(uint32_t)type tag:(uint32_t)tag payload:(nullable PTData*)payload;
+- (void)ioFrameChannel:(PTChannel*)channel didReceiveFrameOfType:(PTFrameType)type tag:(uint32_t)tag payload:(nullable PTData*)payload;
 
 @optional
 // Invoked to accept an incoming frame on a channel. Reply NO ignore the
 // incoming frame. If not implemented by the delegate, all frames are accepted.
-- (BOOL)ioFrameChannel:(PTChannel*)channel shouldAcceptFrameOfType:(uint32_t)type tag:(uint32_t)tag payloadSize:(uint32_t)payloadSize;
+- (BOOL)ioFrameChannel:(PTChannel*)channel shouldAcceptFrameOfType:(PTFrameType)type tag:(uint32_t)tag payloadSize:(uint32_t)payloadSize;
 
 // Invoked when the channel closed. If it closed because of an error, *error* is
 // a non-nil NSError object.

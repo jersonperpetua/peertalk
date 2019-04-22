@@ -21,8 +21,12 @@ NS_ASSUME_NONNULL_BEGIN
 // create a reply for a frame with this tag.
 static const uint32_t PTFrameNoTag = 0;
 
+typedef uint32_t PTFrameType NS_TYPED_EXTENSIBLE_ENUM;
+
+static PTFrameType const PTFrameTypeNone = UINT32_MAX;
+
 // Special frame type that signifies that the stream has ended.
-static const uint32_t PTFrameTypeEndOfStream = 0;
+static PTFrameType const PTFrameTypeEndOfStream = 0;
 
 // NSError domain
 FOUNDATION_EXPORT NSString * const PTProtocolErrorDomain;
@@ -50,7 +54,7 @@ FOUNDATION_EXPORT NSString * const PTProtocolErrorDomain;
 // Send a frame over *channel* with an optional payload and optional callback.
 // If *callback* is not NULL, the block is invoked when either an error occured
 // or when the frame (and payload, if any) has been completely sent.
-- (void)sendFrameOfType:(uint32_t)frameType
+- (void)sendFrameOfType:(PTFrameType)frameType
                     tag:(uint32_t)tag
             withPayload:(dispatch_data_t)payload
             overChannel:(dispatch_io_t)channel
@@ -65,7 +69,7 @@ FOUNDATION_EXPORT NSString * const PTProtocolErrorDomain;
 // When the stream ends, a frame of type PTFrameTypeEndOfStream is received.
 - (void)readFramesOverChannel:(dispatch_io_t)channel
                       onFrame:(nullable void(^)(NSError * _Nullable error,
-                                                uint32_t type,
+                                                PTFrameType type,
                                                 uint32_t tag,
                                                 uint32_t payloadSize,
                                                 dispatch_block_t resumeReadingFrames))onFrame;
@@ -74,7 +78,7 @@ FOUNDATION_EXPORT NSString * const PTProtocolErrorDomain;
 // denotes the stream has ended.
 - (void)readFrameOverChannel:(dispatch_io_t)channel
                     callback:(nullable void(^)(NSError * _Nullable error,
-                                               uint32_t frameType,
+                                               PTFrameType frameType,
                                                uint32_t frameTag,
                                                uint32_t payloadSize))callback;
 

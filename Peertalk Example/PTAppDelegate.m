@@ -179,7 +179,7 @@
 #pragma mark - PTChannelDelegate
 
 
-- (BOOL)ioFrameChannel:(PTChannel*)channel shouldAcceptFrameOfType:(uint32_t)type tag:(uint32_t)tag payloadSize:(uint32_t)payloadSize {
+- (BOOL)ioFrameChannel:(PTChannel*)channel shouldAcceptFrameOfType:(PTFrameType)type tag:(uint32_t)tag payloadSize:(uint32_t)payloadSize {
   if (   type != PTExampleFrameTypeDeviceInfo
       && type != PTExampleFrameTypeTextMessage
       && type != PTExampleFrameTypePing
@@ -193,7 +193,7 @@
   }
 }
 
-- (void)ioFrameChannel:(PTChannel*)channel didReceiveFrameOfType:(uint32_t)type tag:(uint32_t)tag payload:(PTData*)payload {
+- (void)ioFrameChannel:(PTChannel*)channel didReceiveFrameOfType:(PTFrameType)type tag:(uint32_t)tag payload:(PTData*)payload {
   //NSLog(@"received %@, %u, %u, %@", channel, type, tag, payload);
   if (type == PTExampleFrameTypeDeviceInfo) {
     NSDictionary *deviceInfo = [NSDictionary dictionaryWithContentsOfDispatchData:payload.dispatchData];

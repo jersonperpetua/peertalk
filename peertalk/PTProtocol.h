@@ -15,6 +15,8 @@
 #include <dispatch/dispatch.h>
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 // Special frame tag that signifies "no tag". Your implementation should never
 // create a reply for a frame with this tag.
 static const uint32_t PTFrameNoTag = 0;
@@ -35,7 +37,7 @@ FOUNDATION_EXPORT NSString * const PTProtocolErrorDomain;
 + (PTProtocol*)sharedProtocolForQueue:(dispatch_queue_t)queue;
 
 // Initialize a new protocol object to use a specific queue.
-- (id)initWithDispatchQueue:(dispatch_queue_t)queue;
+- (id)initWithDispatchQueue:(nullable dispatch_queue_t)queue;
 
 // Initialize a new protocol object to use the current calling queue.
 - (id)init;
@@ -52,7 +54,7 @@ FOUNDATION_EXPORT NSString * const PTProtocolErrorDomain;
                     tag:(uint32_t)tag
             withPayload:(dispatch_data_t)payload
             overChannel:(dispatch_io_t)channel
-               callback:(void(^)(NSError *error))callback;
+               callback:(nullable void(^)(NSError * _Nullable error))callback;
 
 #pragma mark Receiving frames
 
@@ -62,19 +64,19 @@ FOUNDATION_EXPORT NSString * const PTProtocolErrorDomain;
 // To stop reading frames, simply do not invoke *resumeReadingFrames*.
 // When the stream ends, a frame of type PTFrameTypeEndOfStream is received.
 - (void)readFramesOverChannel:(dispatch_io_t)channel
-                      onFrame:(void(^)(NSError *error,
-                                       uint32_t type,
-                                       uint32_t tag,
-                                       uint32_t payloadSize,
-                                       dispatch_block_t resumeReadingFrames))onFrame;
+                      onFrame:(nullable void(^)(NSError * _Nullable error,
+                                                uint32_t type,
+                                                uint32_t tag,
+                                                uint32_t payloadSize,
+                                                dispatch_block_t resumeReadingFrames))onFrame;
 
 // Read a single frame over *channel*. A frame of type PTFrameTypeEndOfStream
 // denotes the stream has ended.
 - (void)readFrameOverChannel:(dispatch_io_t)channel
-                    callback:(void(^)(NSError *error,
-                                      uint32_t frameType,
-                                      uint32_t frameTag,
-                                      uint32_t payloadSize))callback;
+                    callback:(nullable void(^)(NSError * _Nullable error,
+                                               uint32_t frameType,
+                                               uint32_t frameTag,
+                                               uint32_t payloadSize))callback;
 
 #pragma mark Receiving frame payloads
 
@@ -86,15 +88,15 @@ FOUNDATION_EXPORT NSString * const PTProtocolErrorDomain;
 // returning from the callback.
 - (void)readPayloadOfSize:(size_t)payloadSize
               overChannel:(dispatch_io_t)channel
-                 callback:(void(^)(NSError *error,
-                                   dispatch_data_t contiguousData,
-                                   const uint8_t *buffer,
-                                   size_t bufferSize))callback;
+                 callback:(nullable void(^)(NSError * _Nullable error,
+                                            dispatch_data_t contiguousData,
+                                            const uint8_t *buffer,
+                                            size_t bufferSize))callback;
 
 // Discard data of *size* waiting on *channel*. *callback* can be NULL.
 - (void)readAndDiscardDataOfSize:(size_t)size
                      overChannel:(dispatch_io_t)channel
-                        callback:(void(^)(NSError *error, BOOL endOfStream))callback;
+                        callback:(nullable void(^)(NSError * _Nullable error, BOOL endOfStream))callback;
 
 @end
 
@@ -112,5 +114,7 @@ FOUNDATION_EXPORT NSString * const PTProtocolErrorDomain;
 - (dispatch_data_t)createReferencingDispatchData;
 
 // Decode *data* as a peroperty list-encoded dictionary. Returns nil on failure.
-+ (NSDictionary*)dictionaryWithContentsOfDispatchData:(dispatch_data_t)data;
++ (nullable NSDictionary*)dictionaryWithContentsOfDispatchData:(dispatch_data_t)data;
 @end
+
+NS_ASSUME_NONNULL_END

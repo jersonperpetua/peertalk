@@ -36,10 +36,10 @@ FOUNDATION_EXPORT NSString * const PTUSBDeviceDidDetachNotification;
 FOUNDATION_EXPORT NSString * const PTUSBHubErrorDomain;
 
 // Error codes returned with NSError.code for NSError domain PTUSBHubErrorDomain
-typedef enum {
+typedef NS_ENUM(NSInteger, PTUSBHubError) {
   PTUSBHubErrorBadDevice = 2,
   PTUSBHubErrorConnectionRefused = 3,
-} PTUSBHubError;
+};
 
 @interface PTUSBHub : NSObject
 

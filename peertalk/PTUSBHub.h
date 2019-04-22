@@ -20,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 //    };
 //  }
 //
+NS_SWIFT_NAME(PTUSBDeviceDidAttachNotification)
 FOUNDATION_EXPORT NSString * const PTUSBDeviceDidAttachNotification;
 
 // PTUSBDeviceDidDetachNotification
@@ -30,6 +31,7 @@ FOUNDATION_EXPORT NSString * const PTUSBDeviceDidAttachNotification;
 //    MessageType = Detached;
 //  }
 //
+NS_SWIFT_NAME(PTUSBDeviceDidDetachNotification)
 FOUNDATION_EXPORT NSString * const PTUSBDeviceDidDetachNotification;
 
 // NSError domain
